@@ -1,0 +1,7 @@
+nkscraper.horse\_info\_api module
+=================================
+
+.. automodule:: nkscraper.horse_info_api
+   :members:
+   :undoc-members:
+   :show-inheritance:

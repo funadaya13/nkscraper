@@ -1,0 +1,7 @@
+nkscraper.shutuba\_table\_api module
+====================================
+
+.. automodule:: nkscraper.shutuba_table_api
+   :members:
+   :undoc-members:
+   :show-inheritance:

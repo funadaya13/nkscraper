@@ -1,0 +1,7 @@
+nkscraper.url.shutuba\_table\_url module
+========================================
+
+.. automodule:: nkscraper.url.shutuba_table_url
+   :members:
+   :undoc-members:
+   :show-inheritance:

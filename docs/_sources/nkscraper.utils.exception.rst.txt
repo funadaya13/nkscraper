@@ -1,0 +1,7 @@
+nkscraper.utils.exception module
+================================
+
+.. automodule:: nkscraper.utils.exception
+   :members:
+   :undoc-members:
+   :show-inheritance:

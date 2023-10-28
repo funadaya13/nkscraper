@@ -1,0 +1,7 @@
+nkscraper.url.odds\_url module
+==============================
+
+.. automodule:: nkscraper.url.odds_url
+   :members:
+   :undoc-members:
+   :show-inheritance:
