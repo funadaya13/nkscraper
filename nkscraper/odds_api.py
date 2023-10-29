@@ -45,6 +45,7 @@ class OddsAPI():
         self.__race_id: int = self.__helper.get_id_from_url(contents.url)
         self.__odds_json: dict = self.__scrape_odds_json()
         self.__tansho_odds_json: dict = self.__odds_json['1']
+        self.__num_horse: int = len(self.__tansho_odds_json)
 
     @staticmethod
     def create(race_id: int) -> OddsAPI:
@@ -83,6 +84,14 @@ class OddsAPI():
             int: netkeiba レースID
         """
         return self.__race_id
+
+    def get_num_horse(self) -> int:
+        """ レース出走頭数を取得する
+
+        Returns:
+            int: レース出走頭数
+        """
+        return self.__num_horse
 
     def scrape_tansho_odds(self, umaban: int) -> float | None:
         """ 単勝オッズをスクレイピングする
