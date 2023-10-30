@@ -40,6 +40,7 @@ class HorseInfoAPI():
     __WARN_MESSAGE_0209: str = '上がり3Fタイムが取得できませんでした. 出走取消レース・競走除外レース・海外レースの可能性があります.'
     __WARN_MESSAGE_0210: str = '馬体重が取得できませんでした. 出走取消レース・海外レースの可能性があります.'
     __WARN_MESSAGE_0211: str = '馬体重増減が取得できませんでした. 出走取消レース・海外レースの可能性があります.'
+    __WARN_MESSAGE_0212: str = '着順が取得できませんでした. レースが中止となった可能性があります.'
 
     def __init__(self, contents: NetkeibaContents) -> None:
         """ コンストラクタ
@@ -339,6 +340,10 @@ class HorseInfoAPI():
         # 出走取消レース・競走除外レースの場合
         except ValueError:
             self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0205)
+            return None
+        # 着順欄が空欄の場合
+        except IndexError:
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0212)
             return None
         except Exception as e:
             raise NKScraperException(e)
