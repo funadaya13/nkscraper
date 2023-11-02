@@ -51,6 +51,7 @@ class RaceResultAPI():
             sys.exit()
 
         self.__soup: BeautifulSoup = contents.soup
+        self.__race_id: int = self.__helper.get_id_from_url(contents.url)
         self.__table: list[Tag] = self.__scrape_race_result_table()
         self.__num_horse: int = len(self.__table)
 
@@ -94,6 +95,14 @@ class RaceResultAPI():
         div_race_name: Tag = self.__soup.find('div', class_='RaceName')
         race_name: str = str(div_race_name.contents[0])
         return self.__helper.arrange_string(race_name)
+
+    def scrape_race_id(self) -> int:
+        """ レースIDをスクレイピングする.
+
+        Returns:
+            int: netkeiba レースID
+        """
+        return self.__race_id
 
     def scrape_race_date(self) -> date:
         """ レース開催日をスクレイピングする
