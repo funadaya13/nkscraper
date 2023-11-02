@@ -500,7 +500,7 @@ class HorseInfoAPI():
             return None
         return arranged_corner_ranks
 
-    def scrape_last_3d_time(self, index: int) -> str | None:
+    def scrape_last_3f_time(self, index: int) -> str | None:
         """ 上がり3Fタイムをスクレイピングする
 
         Args:
