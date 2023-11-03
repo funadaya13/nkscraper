@@ -491,9 +491,13 @@ class HorseInfoAPI():
         corner_ranks: str = str(td_corner_ranks.contents[0])
         arranged_corner_ranks: str = self.__helper.arrange_string(corner_ranks)
         # 出走取消レース・競走除外レース・海外レースの場合
+        # NOTE: 新潟1000mのような直線コースの際は、int変換でValueErrorが発生しないことを確認する
         if len(arranged_corner_ranks) == 1:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0208)
-            return None
+            try:
+                int(arranged_corner_ranks)
+            except ValueError:
+                self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0208)
+                return None
         return arranged_corner_ranks
 
     def scrape_last_3d_time(self, index: int) -> str | None:
