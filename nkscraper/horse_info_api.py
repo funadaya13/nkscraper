@@ -56,6 +56,7 @@ class HorseInfoAPI():
             sys.exit()
 
         self.__soup: BeautifulSoup = contents.soup
+        self.__horse_id: int = self.__helper.get_id_from_url(contents.url)
         self.__profile_table: list[Tag] = self.__scrape_profile_table()
         self.__result_table: list[Tag] | None = self.__scrape_result_table()
         self.__num_race_result: int = 0 if self.__result_table is None else len(
@@ -102,6 +103,14 @@ class HorseInfoAPI():
         h1_horse_name: Tag = div_horse_title.find('h1')
         horse_name: str = str(h1_horse_name.contents[0])
         return self.__helper.arrange_string(horse_name)
+
+    def scrape_horse_id(self) -> int:
+        """ 競走馬IDをスクレイピングする.
+
+        Returns:
+            int: netkeiba 競走馬ID
+        """
+        return self.__horse_id
 
     def scrape_trainer_name(self) -> str:
         """ 調教師名をスクレイピングする
@@ -500,7 +509,7 @@ class HorseInfoAPI():
                 return None
         return arranged_corner_ranks
 
-    def scrape_last_3d_time(self, index: int) -> str | None:
+    def scrape_last_3f_time(self, index: int) -> str | None:
         """ 上がり3Fタイムをスクレイピングする
 
         Args:
