@@ -1,5 +1,5 @@
 .. nkscraper documentation master file, created by
-   sphinx-quickstart on Fri Oct 27 19:56:55 2023.
+   sphinx-quickstart on Sat Nov  4 13:59:43 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
