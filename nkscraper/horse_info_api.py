@@ -56,6 +56,7 @@ class HorseInfoAPI():
             sys.exit()
 
         self.__soup: BeautifulSoup = contents.soup
+        self.__horse_id: int = self.__helper.get_id_from_url(contents.url)
         self.__profile_table: list[Tag] = self.__scrape_profile_table()
         self.__result_table: list[Tag] | None = self.__scrape_result_table()
         self.__num_race_result: int = 0 if self.__result_table is None else len(
@@ -100,8 +101,16 @@ class HorseInfoAPI():
         """
         div_horse_title: Tag = self.__soup.find('div', class_='horse_title')
         h1_horse_name: Tag = div_horse_title.find('h1')
-        horse_name: str = str(h1_horse_name.contents[0])
+        horse_name: str = str(h1_horse_name.contents[-1])
         return self.__helper.arrange_string(horse_name)
+
+    def scrape_horse_id(self) -> int:
+        """ 競走馬IDをスクレイピングする.
+
+        Returns:
+            int: netkeiba 競走馬ID
+        """
+        return self.__horse_id
 
     def scrape_trainer_name(self) -> str:
         """ 調教師名をスクレイピングする
@@ -491,12 +500,16 @@ class HorseInfoAPI():
         corner_ranks: str = str(td_corner_ranks.contents[0])
         arranged_corner_ranks: str = self.__helper.arrange_string(corner_ranks)
         # 出走取消レース・競走除外レース・海外レースの場合
+        # NOTE: 新潟1000mのような直線コースの際は、int変換でValueErrorが発生しないことを確認する
         if len(arranged_corner_ranks) == 1:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0208)
-            return None
+            try:
+                int(arranged_corner_ranks)
+            except ValueError:
+                self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0208)
+                return None
         return arranged_corner_ranks
 
-    def scrape_last_3d_time(self, index: int) -> str | None:
+    def scrape_last_3f_time(self, index: int) -> str | None:
         """ 上がり3Fタイムをスクレイピングする
 
         Args:
