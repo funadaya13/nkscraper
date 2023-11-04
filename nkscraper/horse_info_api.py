@@ -101,7 +101,7 @@ class HorseInfoAPI():
         """
         div_horse_title: Tag = self.__soup.find('div', class_='horse_title')
         h1_horse_name: Tag = div_horse_title.find('h1')
-        horse_name: str = str(h1_horse_name.contents[0])
+        horse_name: str = str(h1_horse_name.contents[-1])
         return self.__helper.arrange_string(horse_name)
 
     def scrape_horse_id(self) -> int:
