@@ -14,3 +14,4 @@ class NetkeibaCategory(Enum):
     ODDS = 20  # オッズ
     TRAINING_EVALUATION = 30  # 調教評価
     HORSE_INFO = 40  # 馬情報
+    SEARCHED_RACE = 50  # レース検索結果

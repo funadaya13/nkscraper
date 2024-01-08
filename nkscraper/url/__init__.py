@@ -8,6 +8,7 @@ from .race_result_url import RaceResultURL
 from .shutuba_table_url import ShutubaTableURL
 from .odds_url import OddsURL
 from .training_evaluation_url import TrainingEvaluationURL
+from .searched_race_url import SearchedRaceURL
 
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     'RaceResultURL',
     'OddsURL',
     'TrainingEvaluationURL',
+    'SearchedRaceURL',
 ]
