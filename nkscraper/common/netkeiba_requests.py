@@ -3,12 +3,11 @@
 """
 
 # nkscraper
-from nkscraper.utils import NKScraperLogger
+from nkscraper.utils import NKScraperLogger, NetkeibaRequestsError
 
 # build-in
 import time
 import asyncio
-import sys
 
 # OSS
 from bs4 import BeautifulSoup
@@ -24,8 +23,7 @@ class NetkeibaRequests():
     """ netkeiba HTTP Requests通信クラス
     """
 
-    __ERR_MESSAGE_1201: str = 'Webページの読み込みに失敗しました.'
-    __WARN_MESSAGE_1201: str = '"lxml"の読み込みに失敗したため, "html.parser" を使用します.'
+    __ERR_MESSAGE_01: str = 'netkeiba Webページの読み込みに失敗しました. URL: {}'
 
     def __init__(self) -> None:
         """ コンストラクタ
@@ -66,23 +64,20 @@ class NetkeibaRequests():
             list[NetkeibaContents]: netkeiba Webページコンテンツ配列
         """
 
-        async def __async_process(session, url) -> NetkeibaContents:
+        async def __async_process(session: aiohttp.ClientSession, url: NetkeibaURL) -> NetkeibaContents:
             """ 非同期処理
             """
             try:
                 async with session.get(url.url) as response:
                     html_byte = await response.read()
-                    try:
-                        soup = BeautifulSoup(html_byte, 'lxml')
-                    except Exception as e:
-                        self.__logger.warning(NetkeibaRequests.__WARN_MESSAGE_1201)
-                        soup = BeautifulSoup(html_byte, 'html.parser')
+                    soup = BeautifulSoup(html_byte, 'lxml')
 
                     return NetkeibaContents(url, soup)
 
             except Exception as e:
-                self.__logger.error(NetkeibaRequests.__ERR_MESSAGE_1201)
-                sys.exit()
+                message: str = NetkeibaRequests.__ERR_MESSAGE_01.format(url.url)
+                self.__logger.error(message)
+                raise NetkeibaRequestsError(message) from None
 
         process_start: float = time.perf_counter()
 
@@ -93,7 +88,7 @@ class NetkeibaRequests():
                     __async_process(session, url)) for url in url_list
             ]
 
-            netkeiba_contents_list = await asyncio.gather(*tasks)
+            netkeiba_contents_list: list[NetkeibaContents] = await asyncio.gather(*tasks)
 
         process_end: float = time.perf_counter()
         process_time: float = process_end - process_start
