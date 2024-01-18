@@ -5,14 +5,13 @@
 from __future__ import annotations
 
 # nkscraper
-from nkscraper.utils import NKScraperException, NKScraperLogger, NKScraperHelper
+from nkscraper.utils import InvalidValueError, TableNotFoundError, TableIndexError, NKScraperLogger, NKScraperHelper
 from nkscraper.common import NetkeibaCategory, NetkeibaContents, NetkeibaRequests
 from nkscraper.url import HorseInfoURL
 
 # build-in
 from datetime import datetime
 import re
-import sys
 
 # for type declaration only
 from nkscraper.common import NetkeibaFieldID
@@ -27,9 +26,9 @@ class HorseInfoAPI():
     """ 競走馬情報スクレイピングAPIクラス
     """
 
-    __ERR_MESSAGE_0201: str = 'NetkeibaContentsが競走馬情報ではありません.'
-    __ERR_MESSAGE_0202: str = '競走馬情報が見つかりませんでした.'
-    __ERR_MESSAGE_0203: str = '過去のレース成績が存在しないため、取得できません.'
+    __ERR_MESSAGE_01: str = 'NetkeibaContentsが競走馬情報ではありません. NetkeibaCategory: {}'
+    __ERR_MESSAGE_02: str = '競走馬情報が見つかりませんでした. URL: {}'
+    __ERR_MESSAGE_03: str = '過去のレース成績表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
     __WARN_MESSAGE_0201: str = '過去のレース成績が見つかりませんでした. 新馬の可能性があります.'
     __WARN_MESSAGE_0202: str = '枠番が取得できませんでした. 海外レースの可能性があります.'
     __WARN_MESSAGE_0203: str = '単勝オッズが取得できませんでした. 出走取消レースの場合があります.'
@@ -53,9 +52,11 @@ class HorseInfoAPI():
         self.__helper: NKScraperHelper = NKScraperHelper()
 
         if contents.category != NetkeibaCategory.HORSE_INFO:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0201)
-            sys.exit()
+            message: str = HorseInfoAPI.__ERR_MESSAGE_01.format(contents.category.name)
+            self.__logger.error(message)
+            raise InvalidValueError(message)
 
+        self.__url: str = contents.url
         self.__soup: BeautifulSoup = contents.soup
         self.__horse_id: int = self.__helper.get_id_from_url(contents.url)
         self.__profile_table: list[Tag] = self.__scrape_profile_table()
@@ -191,9 +192,7 @@ class HorseInfoAPI():
         Returns:
             date: レース開催日
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_data: Tag = self.__result_table[index].find_all('td')[0]
         date_str: str = str(td_data.a.contents[0])
         return datetime.strptime(date_str, '%Y/%m/%d').date()
@@ -207,9 +206,7 @@ class HorseInfoAPI():
         Returns:
             str: 競馬場名
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_field_name: Tag = self.__result_table[index].find_all('td')[1]
         field_name: str = str(td_field_name.a.contents[0])
         arranged_field_name: str = self.__helper.arrange_string(field_name)
@@ -224,6 +221,7 @@ class HorseInfoAPI():
         Returns:
             NetkeibaFieldID: NetkeibaFieldID
         """
+        self.__validate_table_index(index)
         field_name: str = self.scrape_field_name(index)
         return self.__helper.convert_field_name_to_id(field_name)
 
@@ -236,9 +234,7 @@ class HorseInfoAPI():
         Returns:
             str: レース名
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_race_name: Tag = self.__result_table[index].find_all('td')[4]
         race_name: str = str(td_race_name.a.contents[0])
         return self.__helper.arrange_string(race_name)
@@ -252,9 +248,7 @@ class HorseInfoAPI():
         Returns:
             int: netkeiba レースID
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_race_name: Tag = self.__result_table[index].find_all('td')[4]
         race_url: str = str(td_race_name.a.attrs['href'])
         return self.__helper.get_id_from_url(race_url)
@@ -268,9 +262,7 @@ class HorseInfoAPI():
         Returns:
             int | None: 枠番 (海外レースで枠番の記載がない場合はNoneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_wakuban: Tag = self.__result_table[index].find_all('td')[7]
         try:
             return int(td_wakuban.contents[0])
@@ -280,7 +272,7 @@ class HorseInfoAPI():
             self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0202)
             return None
         except Exception as e:
-            raise NKScraperException(e)
+            raise e
 
     def scrape_umaban(self, index: int) -> int:
         """ 馬番をスクレイピングする
@@ -291,9 +283,7 @@ class HorseInfoAPI():
         Returns:
             int: 馬番
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_umaban: Tag = self.__result_table[index].find_all('td')[8]
         return int(td_umaban.contents[0])
 
@@ -306,19 +296,18 @@ class HorseInfoAPI():
         Returns:
             int | None: 単勝オッズ (出走取消レースの場合はNoneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_tansho_odds: Tag = self.__result_table[index].find_all('td')[9]
         try:
-            return float(td_tansho_odds.contents[0])
+            # return float(td_tansho_odds.contents[0])
+            raise Exception('TEST')
 
         # 出走取消レースの場合
         except ValueError:
             self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0203)
             return None
         except Exception as e:
-            raise NKScraperException(e)
+            raise e
 
     def scrape_tansho_rank(self, index: int) -> int | None:
         """ 単勝人気をスクレイピングする
@@ -329,9 +318,7 @@ class HorseInfoAPI():
         Returns:
             int | None: 単勝人気 (出走取消レースの場合はNoneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_tansho_rank: Tag = self.__result_table[index].find_all('td')[10]
         try:
             return int(td_tansho_rank.contents[0])
@@ -341,7 +328,7 @@ class HorseInfoAPI():
             self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0204)
             return None
         except Exception as e:
-            raise NKScraperException(e)
+            raise e
 
     def scrape_rank(self, index: int) -> int | None:
         """ 着順をスクレイピングする
@@ -352,9 +339,7 @@ class HorseInfoAPI():
         Returns:
             int | None: 着順 (出走取消レース・競走除外レースの場合はNoneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_rank: Tag = self.__result_table[index].find_all('td')[11]
         try:
             return int(td_rank.contents[0])
@@ -368,7 +353,7 @@ class HorseInfoAPI():
             self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0212)
             return None
         except Exception as e:
-            raise NKScraperException(e)
+            raise e
 
     def scrape_jockey_name(self, index: int) -> str:
         """ 騎手名をスクレイピングする
@@ -379,9 +364,7 @@ class HorseInfoAPI():
         Returns:
             str: 騎手名
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_jockey_name: Tag = self.__result_table[index].find_all('td')[12]
         jockey_name: str = str(td_jockey_name.a.contents[0])
         return self.__helper.arrange_string(jockey_name)
@@ -395,9 +378,7 @@ class HorseInfoAPI():
         Returns:
             int: netkeiba 騎手ID
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_jockey_id: Tag = self.__result_table[index].find_all('td')[12]
         jockey_url: str = td_jockey_id.a.attrs['href']
         return self.__helper.get_id_from_url(jockey_url)
@@ -411,9 +392,7 @@ class HorseInfoAPI():
         Returns:
             int: 騎手ID
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_jockey_weight: Tag = self.__result_table[index].find_all('td')[13]
         jockey_weight: str = td_jockey_weight.contents[0]
         arranged_jockey_weight: str = self.__helper.arrange_string(jockey_weight)
@@ -428,9 +407,7 @@ class HorseInfoAPI():
         Returns:
             str: コース種別
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_course_type: Tag = self.__result_table[index].find_all('td')[14]
         course_type_distance: str = str(td_course_type.contents[0])
         arranged_course_type_distance: str = self.__helper.arrange_string(
@@ -446,9 +423,7 @@ class HorseInfoAPI():
         Returns:
             int: レース距離
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_course_type: Tag = self.__result_table[index].find_all('td')[14]
         course_type_distance: str = str(td_course_type.contents[0])
         arranged_course_type_distance: str = self.__helper.arrange_string(
@@ -464,9 +439,7 @@ class HorseInfoAPI():
         Returns:
             str | None: タイム (出走取消レース・競走除外レース・タイムが取得できない海外レースの場合Noneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_time: Tag = self.__result_table[index].find_all('td')[17]
         time: str = str(td_time.contents[0])
         arranged_time: str = self.__helper.arrange_string(time)
@@ -485,9 +458,7 @@ class HorseInfoAPI():
         Returns:
             str | None: タイム (出走取消レース・競走除外レース・海外レースの場合Noneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_time_difference: Tag = self.__result_table[index].find_all('td')[18]
         time_difference: str = str(td_time_difference.contents[0])
         arranged_time_difference: str = self.__helper.arrange_string(time_difference)
@@ -506,9 +477,7 @@ class HorseInfoAPI():
         Returns:
             str | None: コーナー通過順位 (出走取消レース・競走除外レース・海外レースの場合Noneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_corner_ranks: Tag = self.__result_table[index].find_all('td')[20]
         corner_ranks: str = str(td_corner_ranks.contents[0])
         arranged_corner_ranks: str = self.__helper.arrange_string(corner_ranks)
@@ -531,9 +500,7 @@ class HorseInfoAPI():
         Returns:
             str | None: コーナー通過順位 (出走取消レース・競走除外レース・海外レースの場合Noneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_last_3f_time: Tag = self.__result_table[index].find_all('td')[22]
         last_3f_time: str = str(td_last_3f_time.contents[0])
         arranged_last_3f_time: str = self.__helper.arrange_string(last_3f_time)
@@ -552,9 +519,7 @@ class HorseInfoAPI():
         Returns:
             int | None: 馬体重 (出走取消レース・海外レースの場合Noneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_horse_weight: Tag = self.__result_table[index].find_all('td')[23]
         horse_weight: str = str(td_horse_weight.contents[0])
         arranged_horse_weight: str = self.__helper.arrange_string(horse_weight)
@@ -573,9 +538,7 @@ class HorseInfoAPI():
         Returns:
             int | None: 馬体重増減 (出走取消レース・海外レースの場合Noneを返す)
         """
-        if self.__result_table is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0203)
-            sys.exit()
+        self.__validate_table_index(index)
         td_horse_weight_fluctuation: Tag = self.__result_table[index].find_all('td')[23]
         horse_weight_fluctuation: str = str(td_horse_weight_fluctuation.contents[0])
         arranged_horse_weight_fluctuation: str = self.__helper.arrange_string(
@@ -592,8 +555,9 @@ class HorseInfoAPI():
         """
         table_prof: Tag = self.__soup.find('table', class_='db_prof_table')
         if table_prof is None:
-            self.__logger.error(HorseInfoAPI.__ERR_MESSAGE_0202)
-            sys.exit()
+            message: str = HorseInfoAPI.__ERR_MESSAGE_02.format(self.__url)
+            self.__logger.error(message)
+            raise TableNotFoundError(message)
 
         return table_prof.find_all('tr')
 
@@ -606,3 +570,14 @@ class HorseInfoAPI():
             return None
 
         return table_race_result.find('tbody').findAll('tr')
+
+    # Private Functions for Validate Table Index ----------------------------------
+    def __validate_table_index(self, index: int) -> None:
+        """ 表インデックスをチェックする
+        """
+        min_index: int = 0
+        max_index: int = self.__num_race_result - 1
+        message: str = HorseInfoAPI.__ERR_MESSAGE_03.format(index, self.__url)
+        if index < min_index or index > max_index:
+            self.__logger.error(message)
+            raise TableIndexError(message)
