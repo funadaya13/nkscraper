@@ -1,0 +1,16 @@
+nkscraper.url package
+=====================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   nkscraper.url.horse_info_url
+   nkscraper.url.netkeiba_url
+   nkscraper.url.odds_url
+   nkscraper.url.race_result_url
+   nkscraper.url.searched_race_url
+   nkscraper.url.shutuba_table_url
+   nkscraper.url.training_evaluation_url

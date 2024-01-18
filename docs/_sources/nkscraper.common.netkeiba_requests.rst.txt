@@ -1,0 +1,7 @@
+nkscraper.common.netkeiba\_requests module
+==========================================
+
+.. automodule:: nkscraper.common.netkeiba_requests
+   :members:
+   :undoc-members:
+   :show-inheritance:

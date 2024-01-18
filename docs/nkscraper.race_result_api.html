@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nkscraper.race_result_api module &mdash; nkscraper 0.1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=01f34227"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="nkscraper.searched_race_api module" href="nkscraper.searched_race_api.html" />
+    <link rel="prev" title="nkscraper.odds_api module" href="nkscraper.odds_api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            nkscraper
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="nkscraper.html">nkscraper package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nkscraper.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="nkscraper.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nkscraper.horse_info_api.html">nkscraper.horse_info_api module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nkscraper.odds_api.html">nkscraper.odds_api module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nkscraper.race_result_api module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nkscraper.race_result_api.RaceResultAPI"><code class="docutils literal notranslate"><span class="pre">RaceResultAPI</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nkscraper.searched_race_api.html">nkscraper.searched_race_api module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nkscraper.shutuba_table_api.html">nkscraper.shutuba_table_api module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nkscraper.training_evaluation_api.html">nkscraper.training_evaluation_api module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">nkscraper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="nkscraper.html">nkscraper package</a></li>
+      <li class="breadcrumb-item active">nkscraper.race_result_api module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/nkscraper.race_result_api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-nkscraper.race_result_api">
+<span id="nkscraper-race-result-api-module"></span><h1>nkscraper.race_result_api module<a class="headerlink" href="#module-nkscraper.race_result_api" title="Link to this heading"></a></h1>
+<p>レース結果スクレイピングAPIモジュール</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nkscraper.race_result_api.</span></span><span class="sig-name descname"><span class="pre">RaceResultAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nkscraper.common.netkeiba_contents.html#nkscraper.common.netkeiba_contents.NetkeibaContents" title="nkscraper.common.netkeiba_contents.NetkeibaContents"><span class="pre">NetkeibaContents</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>レース結果スクレイピングAPIクラス</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.create">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">race_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#nkscraper.race_result_api.RaceResultAPI" title="nkscraper.race_result_api.RaceResultAPI"><span class="pre">RaceResultAPI</span></a></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.create" title="Link to this definition"></a></dt>
+<dd><p>レース結果スクレイピングAPIを作成する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>race_id</strong> (<em>int</em>) – netkeiba レースID</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>レース結果スクレイピングAPI</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#nkscraper.race_result_api.RaceResultAPI" title="nkscraper.race_result_api.RaceResultAPI">RaceResultAPI</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.create_by_list">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_by_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">race_id_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#nkscraper.race_result_api.RaceResultAPI" title="nkscraper.race_result_api.RaceResultAPI"><span class="pre">RaceResultAPI</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.create_by_list" title="Link to this definition"></a></dt>
+<dd><p>レース結果スクレイピングAPIを作成する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>race_id_list</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – netkeiba レースID配列</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>レース結果スクレイピングAPI配列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#nkscraper.race_result_api.RaceResultAPI" title="nkscraper.race_result_api.RaceResultAPI">RaceResultAPI</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.get_num_horse">
+<span class="sig-name descname"><span class="pre">get_num_horse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.get_num_horse" title="Link to this definition"></a></dt>
+<dd><p>レース出走頭数を取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>レース出走頭数</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_area">
+<span class="sig-name descname"><span class="pre">scrape_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_area" title="Link to this definition"></a></dt>
+<dd><p>所属をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>所属</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_corner_ranks">
+<span class="sig-name descname"><span class="pre">scrape_corner_ranks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_corner_ranks" title="Link to this definition"></a></dt>
+<dd><p>コーナー通過順位をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>コーナー通過順位 ex: 14-15-14-15 (出走取消馬・競走除外馬の場合はNoneを返す)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_course_type">
+<span class="sig-name descname"><span class="pre">scrape_course_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_course_type" title="Link to this definition"></a></dt>
+<dd><p>コース種別をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>コース種別 (芝 or ダ)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_distance">
+<span class="sig-name descname"><span class="pre">scrape_distance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_distance" title="Link to this definition"></a></dt>
+<dd><p>レース距離をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>レース距離</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_field_id">
+<span class="sig-name descname"><span class="pre">scrape_field_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="nkscraper.common.netkeiba_field_id.html#nkscraper.common.netkeiba_field_id.NetkeibaFieldID" title="nkscraper.common.netkeiba_field_id.NetkeibaFieldID"><span class="pre">NetkeibaFieldID</span></a></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_field_id" title="Link to this definition"></a></dt>
+<dd><p>NetkeibaFieldID をスクレイピングする.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NetkeibaFieldID</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="nkscraper.common.netkeiba_field_id.html#nkscraper.common.netkeiba_field_id.NetkeibaFieldID" title="nkscraper.common.netkeiba_field_id.NetkeibaFieldID">NetkeibaFieldID</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_field_name">
+<span class="sig-name descname"><span class="pre">scrape_field_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_field_name" title="Link to this definition"></a></dt>
+<dd><p>競馬場名をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>競馬場名</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_horse_id">
+<span class="sig-name descname"><span class="pre">scrape_horse_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_horse_id" title="Link to this definition"></a></dt>
+<dd><p>馬IDをスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>netkeiba 馬ID</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_horse_name">
+<span class="sig-name descname"><span class="pre">scrape_horse_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_horse_name" title="Link to this definition"></a></dt>
+<dd><p>馬名をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>馬名</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_horse_weight">
+<span class="sig-name descname"><span class="pre">scrape_horse_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_horse_weight" title="Link to this definition"></a></dt>
+<dd><p>馬体重をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>馬体重 (出走取消馬の場合はNoneを返す)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_horse_weight_fluctuation">
+<span class="sig-name descname"><span class="pre">scrape_horse_weight_fluctuation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_horse_weight_fluctuation" title="Link to this definition"></a></dt>
+<dd><p>馬体重増減をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>馬体重増減 (出走取消馬、または、前回計測不能の場合はNoneを返す)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_jockey_id">
+<span class="sig-name descname"><span class="pre">scrape_jockey_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_jockey_id" title="Link to this definition"></a></dt>
+<dd><p>騎手IDをスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>netkeiba 騎手ID</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_jockey_name">
+<span class="sig-name descname"><span class="pre">scrape_jockey_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_jockey_name" title="Link to this definition"></a></dt>
+<dd><p>騎手名をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>騎手名</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_jockey_weight">
+<span class="sig-name descname"><span class="pre">scrape_jockey_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_jockey_weight" title="Link to this definition"></a></dt>
+<dd><p>斤量をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>斤量</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_last_3f_time">
+<span class="sig-name descname"><span class="pre">scrape_last_3f_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_last_3f_time" title="Link to this definition"></a></dt>
+<dd><p>上がり3Fタイムスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>上がり3Fタイム (出走取消馬・競走除外馬の場合はNoneを返す)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_race_date">
+<span class="sig-name descname"><span class="pre">scrape_race_date</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">date</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_race_date" title="Link to this definition"></a></dt>
+<dd><p>レース開催日をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>レース開催日</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>date</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_race_id">
+<span class="sig-name descname"><span class="pre">scrape_race_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_race_id" title="Link to this definition"></a></dt>
+<dd><p>レースIDをスクレイピングする.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>netkeiba レースID</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_race_name">
+<span class="sig-name descname"><span class="pre">scrape_race_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_race_name" title="Link to this definition"></a></dt>
+<dd><p>レース名をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>レース名</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_rank">
+<span class="sig-name descname"><span class="pre">scrape_rank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_rank" title="Link to this definition"></a></dt>
+<dd><p>着順をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>着順 (出走取消馬、競走除外の場合はNoneを返す)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_sex_age">
+<span class="sig-name descname"><span class="pre">scrape_sex_age</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_sex_age" title="Link to this definition"></a></dt>
+<dd><p>馬性齢をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>馬性齢</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_tansho_odds">
+<span class="sig-name descname"><span class="pre">scrape_tansho_odds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_tansho_odds" title="Link to this definition"></a></dt>
+<dd><p>単勝オッズをスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>単勝オッズ (出走取消馬の場合はNoneを返す)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_tansho_rank">
+<span class="sig-name descname"><span class="pre">scrape_tansho_rank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_tansho_rank" title="Link to this definition"></a></dt>
+<dd><p>単勝人気をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>単勝人気 (出走取消馬の場合はNoneを返す)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_time">
+<span class="sig-name descname"><span class="pre">scrape_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_time" title="Link to this definition"></a></dt>
+<dd><p>タイムをスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>タイム ex: 3:00.0 (出走取消馬・競走除外馬の場合はNoneを返す)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_umaban">
+<span class="sig-name descname"><span class="pre">scrape_umaban</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_umaban" title="Link to this definition"></a></dt>
+<dd><p>馬番をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>馬番</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nkscraper.race_result_api.RaceResultAPI.scrape_wakuban">
+<span class="sig-name descname"><span class="pre">scrape_wakuban</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#nkscraper.race_result_api.RaceResultAPI.scrape_wakuban" title="Link to this definition"></a></dt>
+<dd><p>枠番をスクレイピングする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – 表インデックス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>枠番</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nkscraper.odds_api.html" class="btn btn-neutral float-left" title="nkscraper.odds_api module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nkscraper.searched_race_api.html" class="btn btn-neutral float-right" title="nkscraper.searched_race_api module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, funadaya13.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

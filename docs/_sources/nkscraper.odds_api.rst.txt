@@ -1,0 +1,7 @@
+nkscraper.odds\_api module
+==========================
+
+.. automodule:: nkscraper.odds_api
+   :members:
+   :undoc-members:
+   :show-inheritance:
