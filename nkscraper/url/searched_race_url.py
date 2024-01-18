@@ -4,11 +4,10 @@
 
 # nkscraper
 from nkscraper.utils import NKScraperLogger
-from nkscraper.common import NetkeibaCategory, NetkeibaFieldID
+from nkscraper.common import NetkeibaCategory, NetkeibaFieldID, NetkeibaCorseType
 from nkscraper.url import NetkeibaURL
 
 # built-in
-import sys
 import urllib
 
 # for type declaration only
@@ -20,10 +19,9 @@ class SearchedRaceURL(NetkeibaURL):
     """
 
     URL: str = 'https://db.netkeiba.com/?pid=race_list&sort=date&list=100'
-    __ERR_MESSAGE_01: str = '引数 corse_type には、「芝」か「ダ」を入力してください.'
 
     def __init__(self, race_name: str, field_id: NetkeibaFieldID, 
-                 distance: int, corse_type: str, start_year: int,
+                 distance: int, corse_type: NetkeibaCorseType, start_year: int,
                  start_month: int, end_year: int, end_month: int) -> None:
         """ コンストラクタ
 
@@ -41,11 +39,8 @@ class SearchedRaceURL(NetkeibaURL):
 
         self.__race_name: str = urllib.parse.quote(race_name, encoding='euc-jp')
         self.__field_id: str = field_id.value
-        self.__distance = distance
-        if corse_type != '芝' and corse_type != 'ダ':
-            self.__logger.error(SearchedRaceURL.__ERR_MESSAGE_01)
-            sys.exit()
-        self.__corse_type: int = 1 if corse_type == '芝' else 2
+        self.__distance: int = distance
+        self.__corse_type: int = corse_type.value['display']
         self.__start_year: int = start_year
         self.__start_mon: int = start_month
         self.__end_year: int = end_year
