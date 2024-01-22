@@ -25,8 +25,8 @@ class OddsAPI():
     __ERR_MESSAGE_01: str = 'NetkeibaContentsがオッズではありません. category: {}'
     __ERR_MESSAGE_02: str = 'オッズを取得できませんでした. 馬券の販売が開始されていない可能性があります. URL: {}'
     __ERR_MESSAGE_03: str = '不適切な馬番が入力されました. umaban: {}, URL: {}'
-    __WARN_MESSAGE_0301: str = 'オッズを取得できませんでした. 出走取消馬の可能性があります.'
-    __WARN_MESSAGE_0302: str = '単勝人気を取得できませんでした. 出走取消馬の可能性があります.'
+    __WARN_MESSAGE_01: str = 'オッズを取得できませんでした. 出走取消馬の可能性があります. umaban: {}, URL: {}'
+    __WARN_MESSAGE_02: str = '単勝人気を取得できませんでした. 出走取消馬の可能性があります. umaban: {}, URL: {}'
 
     def __init__(self, contents: NetkeibaContents) -> None:
         """ コンストラクタ
@@ -110,7 +110,7 @@ class OddsAPI():
         tansho_odds: float = float(data[0])
         # 出走取消馬の場合
         if tansho_odds < 0:
-            self.__logger.warning(self.__WARN_MESSAGE_0301)
+            self.__logger.warning(self.__WARN_MESSAGE_01.format(umaban, self.__url))
             return None
         return tansho_odds
 
@@ -129,7 +129,7 @@ class OddsAPI():
         tansho_rank: int = int(data[2])
         # 出走取消馬の場合
         if tansho_rank == 9999:
-            self.__logger.warning(self.__WARN_MESSAGE_0302)
+            self.__logger.warning(self.__WARN_MESSAGE_02.format(umaban, self.__url))
             return None
         return tansho_rank
 

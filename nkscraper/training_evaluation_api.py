@@ -29,9 +29,9 @@ class TrainingEvaluationAPI():
     __ERR_MESSAGE_01: str = 'NetkeibaContentsが調教評価ではありません. category: {}'
     __ERR_MESSAGE_02: str = '調教評価表を取得できませんでした. URL: {}'
     __ERR_MESSAGE_03: str = '調教評価表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
-    __WARN_MESSAGE_0401: str = '枠番を取得できませんでした. 出馬表が確定していない可能性があります.'
-    __WARN_MESSAGE_0402: str = '馬番を取得できませんでした. 出馬表が確定していない可能性があります.'
-    __WARN_MESSAGE_0403: str = '調教評価を取得できませんでした. 調教評価に記載がない可能性があります.'
+    __WARN_MESSAGE_01: str = '枠番を取得できませんでした. 出馬表が確定していない可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_02: str = '馬番を取得できませんでした. 出馬表が確定していない可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_03: str = '調教評価を取得できませんでした. 調教評価に記載がない可能性があります. index: {}, URL: {}'
 
     def __init__(self, contents: NetkeibaContents) -> None:
         """ コンストラクタ
@@ -183,7 +183,7 @@ class TrainingEvaluationAPI():
 
         # 枠番が確定されていない場合
         except IndexError:
-            self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_0401)
+            self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_01.format(index, self.__url))
             return None
 
     def scrape_umaban(self, index: int) -> int | None:
@@ -203,7 +203,7 @@ class TrainingEvaluationAPI():
 
         # 馬番が確定されていない場合
         except IndexError:
-            self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_0402)
+            self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_02.format(index, self.__url))
             return None
 
     def scrape_horse_name(self, index: int) -> str:
@@ -252,7 +252,7 @@ class TrainingEvaluationAPI():
             return self.__helper.arrange_string(training_evaluation)
 
         except IndexError:
-            self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_0403)
+            self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_03.format(index, self.__url))
             return None
 
     # Private Functions for Scrape Training Evaluation Table -----------------

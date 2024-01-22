@@ -29,13 +29,13 @@ class ShutubaTableAPI():
     __ERR_MESSAGE_01: str = 'NetkeibaContentsが出馬表ではありません. category: {}'
     __ERR_MESSAGE_02: str = '出馬表を取得できませんでした. URL: {}'
     __ERR_MESSAGE_03: str = '出馬表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
-    __WARN_MESSAGE_0001: str = '枠番を取得できませんでした. 出馬表が確定していない可能性があります.'
-    __WARN_MESSAGE_0002: str = '馬番を取得できませんでした. 出馬表が確定していない可能性があります.'
-    __WARN_MESSAGE_0003: str = '騎手を取得できませんでした. 出馬表が確定していない可能性があります.'
-    __WARN_MESSAGE_0004: str = '騎手IDを取得できませんでした. 出馬表が確定していない可能性があります.'
-    __WARN_MESSAGE_0005: str = '馬体重を取得できませんでした. 馬体重が確定していない可能性があります.'
-    __WARN_MESSAGE_0006: str = '馬体重を取得できませんでした. 出走取消馬の可能性があります.'
-    __WARN_MESSAGE_0007: str = '馬体重増減を取得できませんでした. 馬体重が確定していない, または, 出走取消馬の可能性があります.'
+    __WARN_MESSAGE_01: str = '枠番を取得できませんでした. 出馬表が確定していない可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_02: str = '馬番を取得できませんでした. 出馬表が確定していない可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_03: str = '騎手を取得できませんでした. 出馬表が確定していない可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_04: str = '騎手IDを取得できませんでした. 出馬表が確定していない可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_05: str = '馬体重を取得できませんでした. 馬体重が確定していない可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_06: str = '馬体重を取得できませんでした. 出走取消馬の可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_07: str = '馬体重増減を取得できませんでした. 馬体重が確定していない, または, 出走取消馬の可能性があります. index: {}, URL: {}'
 
     def __init__(self, contents: NetkeibaContents) -> None:
         """ コンストラクタ
@@ -184,7 +184,7 @@ class ShutubaTableAPI():
 
         # 枠番が確定されていない場合
         except IndexError:
-            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0001)
+            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_01.format(index, self.__url))
             return None
 
     def scrape_umaban(self, index: int) -> int | None:
@@ -204,7 +204,7 @@ class ShutubaTableAPI():
 
         # 馬番が確定されていない場合
         except IndexError:
-            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0002)
+            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_02.format(index, self.__url))
             return None
 
     def scrape_horse_name(self, index: int) -> str:
@@ -288,7 +288,7 @@ class ShutubaTableAPI():
 
         # 騎手が確定していない場合
         except AttributeError:
-            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0003)
+            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_03.format(index, self.__url))
             return None
 
     def scrape_jockey_id(self, index: int) -> int | None:
@@ -308,7 +308,7 @@ class ShutubaTableAPI():
 
         # 騎手が確定していない場合
         except AttributeError:
-            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0004)
+            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_04.format(index, self.__url))
             return None
 
     def scrape_area(self, index: int) -> str:
@@ -371,11 +371,11 @@ class ShutubaTableAPI():
 
         # 馬体重が確定していない場合
         except ValueError:
-            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0005)
+            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_05.format(index, self.__url))
             return None
         # 出走取消馬の場合
         except AttributeError:
-            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0006)
+            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_06.format(index, self.__url))
             return None
 
     def scrape_horse_weight_fluctuation(self, index: int) -> int | None:
@@ -395,7 +395,7 @@ class ShutubaTableAPI():
 
         # 馬体重が未確定・出走取消馬の場合
         except AttributeError:
-            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0007)
+            self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_07.format(index, self.__url))
             return None
 
     # Private Functions for Scrape ShutubaTable ------------------------------

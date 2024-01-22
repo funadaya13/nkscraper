@@ -29,18 +29,18 @@ class HorseInfoAPI():
     __ERR_MESSAGE_01: str = 'NetkeibaContentsが競走馬情報ではありません. category: {}'
     __ERR_MESSAGE_02: str = '競走馬情報が見つかりませんでした. URL: {}'
     __ERR_MESSAGE_03: str = '過去のレース成績表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
-    __WARN_MESSAGE_0201: str = '過去のレース成績が見つかりませんでした. 新馬の可能性があります.'
-    __WARN_MESSAGE_0202: str = '枠番が取得できませんでした. 海外レースの可能性があります.'
-    __WARN_MESSAGE_0203: str = '単勝オッズが取得できませんでした. 出走取消レースの場合があります.'
-    __WARN_MESSAGE_0204: str = '単勝人気が取得できませんでした. 出走取消レースの場合があります.'
-    __WARN_MESSAGE_0205: str = '着順が取得できませんでした. 出走取消レース・競走除外レースの可能性があります.'
-    __WARN_MESSAGE_0206: str = 'タイムが取得できませんでした. 出走取消レース・競走除外レース・タイムが取得できない海外レースの可能性があります.'
-    __WARN_MESSAGE_0207: str = '着差が取得できませんでした. 出走取消レース・競走除外レース・海外レースの可能性があります.'
-    __WARN_MESSAGE_0208: str = 'コーナー通過順位が取得できませんでした. 出走取消レース・競走除外レース・海外レースの可能性があります.'
-    __WARN_MESSAGE_0209: str = '上がり3Fタイムが取得できませんでした. 出走取消レース・競走除外レース・海外レースの可能性があります.'
-    __WARN_MESSAGE_0210: str = '馬体重が取得できませんでした. 出走取消レース・海外レースの可能性があります.'
-    __WARN_MESSAGE_0211: str = '馬体重増減が取得できませんでした. 出走取消レース・海外レースの可能性があります.'
-    __WARN_MESSAGE_0212: str = '着順が取得できませんでした. レースが中止となった可能性があります.'
+    __WARN_MESSAGE_01: str = '過去のレース成績が見つかりませんでした. 新馬の可能性があります.URL: {}'
+    __WARN_MESSAGE_02: str = '枠番が取得できませんでした. 海外レースの可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_03: str = '単勝オッズが取得できませんでした. 出走取消レースの場合があります. index: {}, URL: {}'
+    __WARN_MESSAGE_04: str = '単勝人気が取得できませんでした. 出走取消レースの場合があります. index: {}, URL: {}'
+    __WARN_MESSAGE_05: str = '着順が取得できませんでした. 出走取消レース・競走除外レースの可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_06: str = 'タイムが取得できませんでした. 出走取消レース・競走除外レース・タイムが取得できない海外レースの可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_07: str = '着差が取得できませんでした. 出走取消レース・競走除外レース・海外レースの可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_08: str = 'コーナー通過順位が取得できませんでした. 出走取消レース・競走除外レース・海外レースの可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_09: str = '上がり3Fタイムが取得できませんでした. 出走取消レース・競走除外レース・海外レースの可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_10: str = '馬体重が取得できませんでした. 出走取消レース・海外レースの可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_11: str = '馬体重増減が取得できませんでした. 出走取消レース・海外レースの可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_12: str = '着順が取得できませんでした. レースが中止となった可能性があります. index: {}, URL: {}'
 
     def __init__(self, contents: NetkeibaContents) -> None:
         """ コンストラクタ
@@ -269,7 +269,7 @@ class HorseInfoAPI():
 
         # 海外レースの場合
         except ValueError:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0202)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_02.format(index, self.__url))
             return None
         except Exception as e:
             raise e
@@ -304,7 +304,7 @@ class HorseInfoAPI():
 
         # 出走取消レースの場合
         except ValueError:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0203)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_03.format(index, self.__url))
             return None
         except Exception as e:
             raise e
@@ -325,7 +325,7 @@ class HorseInfoAPI():
 
         # 出走取消レースの場合
         except ValueError:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0204)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_04.format(index, self.__url))
             return None
         except Exception as e:
             raise e
@@ -346,11 +346,11 @@ class HorseInfoAPI():
 
         # 出走取消レース・競走除外レースの場合
         except ValueError:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0205)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_05.format(index, self.__url))
             return None
         # 着順欄が空欄の場合
         except IndexError:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0212)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_12.format(index, self.__url))
             return None
         except Exception as e:
             raise e
@@ -445,7 +445,7 @@ class HorseInfoAPI():
         arranged_time: str = self.__helper.arrange_string(time)
         # 出走取消レース・競走除外レース・タイムが取得できない海外レースの場合
         if len(arranged_time) == 1:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0206)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_06.format(index, self.__url))
             return None
         return arranged_time
 
@@ -464,7 +464,7 @@ class HorseInfoAPI():
         arranged_time_difference: str = self.__helper.arrange_string(time_difference)
         # 出走取消レース・競走除外レース・海外レースの場合
         if len(arranged_time_difference) == 1:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0207)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_07.format(index, self.__url))
             return None
         return time_difference
 
@@ -487,7 +487,7 @@ class HorseInfoAPI():
             try:
                 int(arranged_corner_ranks)
             except ValueError:
-                self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0208)
+                self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_08.format(index, self.__url))
                 return None
         return arranged_corner_ranks
 
@@ -506,7 +506,7 @@ class HorseInfoAPI():
         arranged_last_3f_time: str = self.__helper.arrange_string(last_3f_time)
         # 出走取消レース・競走除外レース・海外レースの場合
         if len(arranged_last_3f_time) == 1:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0209)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_09.format(index, self.__url))
             return None
         return arranged_last_3f_time
 
@@ -525,7 +525,7 @@ class HorseInfoAPI():
         arranged_horse_weight: str = self.__helper.arrange_string(horse_weight)
         # 出走取消レース・海外レースの場合
         if arranged_horse_weight == '計不':
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0210)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_10.format(index, self.__url))
             return None
         return int(arranged_horse_weight[0:3])
 
@@ -545,7 +545,7 @@ class HorseInfoAPI():
             horse_weight_fluctuation)
         # 出走取消レース・海外レースの場合
         if arranged_horse_weight_fluctuation == '計不':
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0211)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_11.format(index, self.__url))
             return None
         return int(arranged_horse_weight_fluctuation[3:-1].replace('(', ''))
 
@@ -566,7 +566,7 @@ class HorseInfoAPI():
         """
         table_race_result: Tag = self.__soup.find('table', class_='db_h_race_results')
         if table_race_result is None:
-            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_0201)
+            self.__logger.warning(HorseInfoAPI.__WARN_MESSAGE_01.format(self.__url))
             return None
 
         return table_race_result.find('tbody').findAll('tr')

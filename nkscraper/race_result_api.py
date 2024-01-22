@@ -29,14 +29,14 @@ class RaceResultAPI():
     __ERR_MESSAGE_01: str = 'NetkeibaContentsがレース結果ではありません. category: {}'
     __ERR_MESSAGE_02: str = 'レース結果表が見つかりませんでした. URL: {}'
     __ERR_MESSAGE_03: str = 'レース結果表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
-    __WARN_MESSAGE_0101: str = '着順を取得できませんでした. 出走取消馬・または競走除外馬の可能性があります.'
-    __WARN_MESSAGE_0102: str = 'タイムを取得できませんでした. 出走取消馬・競走除外馬の可能性があります.'
-    __WARN_MESSAGE_0103: str = '単勝人気を取得できませんでした. 出走取消馬の可能性があります.'
-    __WARN_MESSAGE_0104: str = '単勝オッズを取得できませんでした. 出走取消馬の可能性があります.'
-    __WARN_MESSAGE_0105: str = '上がり3Fタイムを取得できませんでした. 出走取消馬・競走除外馬の可能性があります.'
-    __WARN_MESSAGE_0106: str = 'コーナー通過順位を取得できませんでした. 出走取消馬・競走除外馬の可能性があります.'
-    __WARN_MESSAGE_0107: str = '馬体重を取得できませんでした. 出走取消馬の可能性があります.'
-    __WARN_MESSAGE_0108: str = '馬体重増減を取得できませんでした. 出走取消馬, または, 前回馬体重が計測不能だった可能性があります.'
+    __WARN_MESSAGE_01: str = '着順を取得できませんでした. 出走取消馬・または競走除外馬の可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_02: str = 'タイムを取得できませんでした. 出走取消馬・競走除外馬の可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_03: str = '単勝人気を取得できませんでした. 出走取消馬の可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_04: str = '単勝オッズを取得できませんでした. 出走取消馬の可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_05: str = '上がり3Fタイムを取得できませんでした. 出走取消馬・競走除外馬の可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_06: str = 'コーナー通過順位を取得できませんでした. 出走取消馬・競走除外馬の可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_07: str = '馬体重を取得できませんでした. 出走取消馬の可能性があります. index: {}, URL: {}'
+    __WARN_MESSAGE_08: str = '馬体重増減を取得できませんでした. 出走取消馬, または, 前回馬体重が計測不能だった可能性があります. index: {}, URL: {}'
 
     def __init__(self, contents: NetkeibaContents) -> None:
         """ コンストラクタ
@@ -185,7 +185,7 @@ class RaceResultAPI():
 
         # 出走取消馬・競走除外馬の場合
         except ValueError:
-            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0101)
+            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_01.format(index, self.__url))
             return None
 
     def scrape_wakuban(self, index: int) -> int:
@@ -320,7 +320,7 @@ class RaceResultAPI():
 
         # 出走取消馬・競走除外馬の場合
         except IndexError:
-            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0102)
+            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_02.format(index, self.__url))
             return None
 
     def scrape_tansho_rank(self, index: int) -> int | None:
@@ -340,7 +340,7 @@ class RaceResultAPI():
 
         # 出走取消馬の場合
         except IndexError:
-            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0103)
+            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_03.format(index, self.__url))
             return None
 
     def scrape_tansho_odds(self, index: int) -> float | None:
@@ -360,7 +360,7 @@ class RaceResultAPI():
 
         # 出走取消馬の場合
         except IndexError:
-            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0104)
+            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_04.format(index, self.__url))
             return None
 
     def scrape_last_3f_time(self, index: int) -> float | None:
@@ -381,7 +381,7 @@ class RaceResultAPI():
 
         # 出走取消馬・競走除外馬の場合
         except ValueError:
-            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0105)
+            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_05.format(index, self.__url))
             return None
 
     def scrape_corner_ranks(self, index: int) -> str | None:
@@ -399,7 +399,7 @@ class RaceResultAPI():
         corner_ranks: str = td_passage_rate.contents[0]
         arranged_corner_ranks: str = self.__helper.arrange_string(corner_ranks)
         if arranged_corner_ranks == '':
-            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0106)
+            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_06.format(index, self.__url))
             return None
         return arranged_corner_ranks
 
@@ -435,7 +435,7 @@ class RaceResultAPI():
 
         # 出走取消馬の場合
         except ValueError:
-            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0107)
+            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_07.format(index, self.__url))
             return None
 
     def scrape_horse_weight_fluctuation(self, index: int) -> int | None:
@@ -456,7 +456,7 @@ class RaceResultAPI():
 
         # 出走取消馬、または、前回計測不能の場合
         except IndexError:
-            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0108)
+            self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_08.format(index, self.__url))
             return None
 
     # Private Functions for Scrape Race Result Table -------------------------
