@@ -5,14 +5,13 @@
 from __future__ import annotations
 
 # nkscraper
-from nkscraper.utils import NKScraperException, NKScraperLogger, NKScraperHelper
+from nkscraper.utils import InvalidValueError, TableNotFoundError, TableIndexError, NKScraperLogger, NKScraperHelper
 from nkscraper.common import NetkeibaCategory, NetkeibaContents, NetkeibaRequests
 from nkscraper.url import TrainingEvaluationURL
 
 # build-in
 from datetime import datetime
 import re
-import sys
 
 # for type declaration only
 from nkscraper.common import NetkeibaFieldID
@@ -27,8 +26,9 @@ class TrainingEvaluationAPI():
     """ 調教評価スクレイピングAPIクラス
     """
 
-    __ERR_MESSAGE_0401: str = 'NetkeibaContentsが調教評価ではありません.'
-    __ERR_MESSAGE_0402: str = '調教評価表を取得できませんでした.'
+    __ERR_MESSAGE_01: str = 'NetkeibaContentsが調教評価ではありません. category: {}'
+    __ERR_MESSAGE_02: str = '調教評価表を取得できませんでした. URL: {}'
+    __ERR_MESSAGE_03: str = '調教評価表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
     __WARN_MESSAGE_0401: str = '枠番を取得できませんでした. 出馬表が確定していない可能性があります.'
     __WARN_MESSAGE_0402: str = '馬番を取得できませんでした. 出馬表が確定していない可能性があります.'
     __WARN_MESSAGE_0403: str = '調教評価を取得できませんでした. 調教評価に記載がない可能性があります.'
@@ -43,9 +43,11 @@ class TrainingEvaluationAPI():
         self.__helper: NKScraperHelper = NKScraperHelper()
 
         if contents.category != NetkeibaCategory.TRAINING_EVALUATION:
-            self.__logger.error(TrainingEvaluationAPI.__ERR_MESSAGE_0401)
-            sys.exit()
+            message: str = TrainingEvaluationAPI.__ERR_MESSAGE_01.format(contents.category)
+            self.__logger.error(message)
+            raise InvalidValueError(message)
 
+        self.__url: str = contents.url
         self.__soup: BeautifulSoup = contents.soup
         self.__race_id: int = self.__helper.get_id_from_url(contents.url)
         self.__table: list[Tag] = self.__scrape_training_evaluation_table()
@@ -172,6 +174,7 @@ class TrainingEvaluationAPI():
         Returns:
             int | None: 枠番 (枠番が確定していない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_waku: Tag = self.__table[index].find(
             'td', class_=re.compile('Waku'))
         span_waku: Tag = td_waku.contents[0]
@@ -182,8 +185,6 @@ class TrainingEvaluationAPI():
         except IndexError:
             self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_0401)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_umaban(self, index: int) -> int | None:
         """ 馬番をスクレイピングする
@@ -194,6 +195,7 @@ class TrainingEvaluationAPI():
         Returns:
             int | None: 馬番 (馬番が確定していない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_umaban: Tag = self.__table[index].find(
             'td', class_='Umaban')
         try:
@@ -203,8 +205,6 @@ class TrainingEvaluationAPI():
         except IndexError:
             self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_0402)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_horse_name(self, index: int) -> str:
         """ 馬名をスクレイピングする
@@ -215,6 +215,7 @@ class TrainingEvaluationAPI():
         Returns:
             str: 馬名
         """
+        self.__validate_table_index(index)
         div_horse_name: Tag = self.__table[index].find(
             'div', class_='Horse_Name')
         horse_name: str = div_horse_name.a.contents[0]
@@ -229,6 +230,7 @@ class TrainingEvaluationAPI():
         Returns:
             int: netkeiba 馬ID
         """
+        self.__validate_table_index(index)
         div_horse_name: Tag = self.__table[index].find(
             'div', class_='Horse_Name')
         horse_url: str = div_horse_name.a.attrs['href']
@@ -243,6 +245,7 @@ class TrainingEvaluationAPI():
         Returns:
             str | None: 調教評価 (記載がない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_training_evaluation: Tag = self.__table[index].findAll('td')[5]
         try:
             training_evaluation: str = td_training_evaluation.contents[0]
@@ -251,8 +254,6 @@ class TrainingEvaluationAPI():
         except IndexError:
             self.__logger.warning(TrainingEvaluationAPI.__WARN_MESSAGE_0403)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     # Private Functions for Scrape Training Evaluation Table -----------------
     def __scrape_training_evaluation_table(self) -> list[Tag]:
@@ -263,7 +264,17 @@ class TrainingEvaluationAPI():
             return table.findAll('tr', class_='HorseList')
 
         except AttributeError:
-            self.__logger.error(TrainingEvaluationAPI.__ERR_MESSAGE_0402)
-            sys.exit()
-        except Exception as e:
-            raise NKScraperException(e)
+            message: str = TrainingEvaluationAPI.__ERR_MESSAGE_02.format(self.__url)
+            self.__logger.error(message)
+            raise TableNotFoundError(message)
+
+    # Private Functions for Validate Table Index ----------------------------------
+    def __validate_table_index(self, index: int) -> None:
+        """ 表インデックスをチェックする
+        """
+        min_index: int = 0
+        max_index: int = self.__num_horse - 1
+        if index < min_index or index > max_index:
+            message: str = TrainingEvaluationAPI.__ERR_MESSAGE_03.format(index, self.__url)
+            self.__logger.error(message)
+            raise TableIndexError(message)

@@ -5,13 +5,12 @@
 from __future__ import annotations
 
 # nkscraper
-from nkscraper.utils import NKScraperException, NKScraperLogger, NKScraperHelper
+from nkscraper.utils import InvalidValueError, TableIndexError, NKScraperLogger, NKScraperHelper
 from nkscraper.common import NetkeibaCategory, NetkeibaContents, NetkeibaRequests, NetkeibaFieldID
 from nkscraper.url import SearchedRaceURL
 
 # build-in
 from datetime import datetime
-import sys
 
 # for type declaration only
 from nkscraper.url import NetkeibaURL
@@ -25,8 +24,9 @@ class SearchedRaceAPI():
     """ レース検索結果スクレイピングAPIクラス
     """
 
-    __ERR_MESSAGE_0501: str = 'NetkeibaContentsがレース検索結果ではありません.'
-    __ERR_MESSAGE_0502: str = '該当するレースが見つかりませんでした.'
+    __ERR_MESSAGE_01: str = 'NetkeibaContentsがレース検索結果ではありません. category: {}'
+    __ERR_MESSAGE_02: str = 'レース検索結果表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
+    __WARN_MESSAGE_01: str = '該当するレースが見つかりませんでした. URL: {}'
 
     def __init__(self, contents: NetkeibaContents) -> None:
         """ コンストラクタ
@@ -38,9 +38,11 @@ class SearchedRaceAPI():
         self.__helper: NKScraperHelper = NKScraperHelper()
 
         if contents.category != NetkeibaCategory.SEARCHED_RACE:
-            self.__logger.error(SearchedRaceAPI.__ERR_MESSAGE_0501)
-            sys.exit()
+            message: str = SearchedRaceAPI.__ERR_MESSAGE_01.format(contents.category)
+            self.__logger.error(message)
+            raise InvalidValueError(message)
 
+        self.__url: str = contents.url
         self.__soup: BeautifulSoup = contents.soup
         self.__race_table: list[Tag] = self.__scrape_race_table()
 
@@ -87,6 +89,7 @@ class SearchedRaceAPI():
         Returns:
             date: レース開催日
         """
+        self.__validate_table_index(index)
         td_list: list[Tag] = self.__race_table[index].find_all('td')
         date_str: str = td_list[0].a.contents[0]
         return datetime.strptime(date_str, '%Y/%m/%d').date()
@@ -100,6 +103,7 @@ class SearchedRaceAPI():
         Returns:
             str: レース名
         """
+        self.__validate_table_index(index)
         td_list: list[Tag] = self.__race_table[index].find_all('td')
         race_name: str = str(td_list[4].a.contents[0])
         return self.__helper.arrange_string(race_name)
@@ -113,6 +117,7 @@ class SearchedRaceAPI():
         Returns:
             int: netkeiba レースID
         """
+        self.__validate_table_index(index)
         td_list: list[Tag] = self.__race_table[index].find_all('td')
         url: str = str(td_list[4].a.attrs['href'])
         return self.__helper.get_id_from_url(url)
@@ -126,6 +131,7 @@ class SearchedRaceAPI():
         Returns:
             int: レース出走頭数
         """
+        self.__validate_table_index(index)
         td_list: list[Tag] = self.__race_table[index].find_all('td')
         return int(td_list[7].contents[0])
 
@@ -136,7 +142,18 @@ class SearchedRaceAPI():
         table: Tag = self.__soup.find('table', class_='race_table_01')
         # 検索該当レースがない場合
         if table is None:
-            self.__logger.error(SearchedRaceAPI.__ERR_MESSAGE_0502)
-            sys.exit()
+            self.__logger.warning(SearchedRaceAPI.__WARN_MESSAGE_01.format(self.__url))
+            return []
         table_row_list: list[Tag] = table.findAll('tr')
         return table_row_list[1:]
+
+    # Private Functions for Validate Table Index ----------------------------------
+    def __validate_table_index(self, index: int) -> None:
+        """ 表インデックスをチェックする
+        """
+        min_index: int = 0
+        max_index: int = self.__num_horse - 1
+        if index < min_index or index > max_index:
+            message: str = SearchedRaceAPI.__ERR_MESSAGE_02.format(index, self.__url)
+            self.__logger.error(message)
+            raise TableIndexError(message)

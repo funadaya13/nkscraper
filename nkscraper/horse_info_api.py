@@ -26,7 +26,7 @@ class HorseInfoAPI():
     """ 競走馬情報スクレイピングAPIクラス
     """
 
-    __ERR_MESSAGE_01: str = 'NetkeibaContentsが競走馬情報ではありません. NetkeibaCategory: {}'
+    __ERR_MESSAGE_01: str = 'NetkeibaContentsが競走馬情報ではありません. category: {}'
     __ERR_MESSAGE_02: str = '競走馬情報が見つかりませんでした. URL: {}'
     __ERR_MESSAGE_03: str = '過去のレース成績表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
     __WARN_MESSAGE_0201: str = '過去のレース成績が見つかりませんでした. 新馬の可能性があります.'
@@ -577,7 +577,7 @@ class HorseInfoAPI():
         """
         min_index: int = 0
         max_index: int = self.__num_race_result - 1
-        message: str = HorseInfoAPI.__ERR_MESSAGE_03.format(index, self.__url)
         if index < min_index or index > max_index:
+            message: str = HorseInfoAPI.__ERR_MESSAGE_03.format(index, self.__url)
             self.__logger.error(message)
             raise TableIndexError(message)

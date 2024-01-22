@@ -5,14 +5,13 @@
 from __future__ import annotations
 
 # nkscraper
-from nkscraper.utils import NKScraperException, NKScraperLogger, NKScraperHelper
+from nkscraper.utils import InvalidValueError, TableNotFoundError, TableIndexError, NKScraperLogger, NKScraperHelper
 from nkscraper.common import NetkeibaCategory, NetkeibaContents, NetkeibaRequests
 from nkscraper.url import ShutubaTableURL
 
 # build-in
 from datetime import datetime
 import re
-import sys
 
 # for type declaration only
 from nkscraper.common import NetkeibaFieldID
@@ -27,8 +26,9 @@ class ShutubaTableAPI():
     """ 出馬表スクレイピングAPIクラス
     """
 
-    __ERR_MESSAGE_0001: str = 'NetkeibaContentsが出馬表ではありません.'
-    __ERR_MESSAGE_0002: str = '出馬表を取得できませんでした.'
+    __ERR_MESSAGE_01: str = 'NetkeibaContentsが出馬表ではありません. category: {}'
+    __ERR_MESSAGE_02: str = '出馬表を取得できませんでした. URL: {}'
+    __ERR_MESSAGE_03: str = '出馬表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
     __WARN_MESSAGE_0001: str = '枠番を取得できませんでした. 出馬表が確定していない可能性があります.'
     __WARN_MESSAGE_0002: str = '馬番を取得できませんでした. 出馬表が確定していない可能性があります.'
     __WARN_MESSAGE_0003: str = '騎手を取得できませんでした. 出馬表が確定していない可能性があります.'
@@ -47,9 +47,11 @@ class ShutubaTableAPI():
         self.__helper: NKScraperHelper = NKScraperHelper()
 
         if contents.category != NetkeibaCategory.SHUTUBA_TABLE:
-            self.__logger.error(ShutubaTableAPI.__ERR_MESSAGE_0001)
-            sys.exit()
+            message: str = ShutubaTableAPI.__ERR_MESSAGE_01.format(contents.category)
+            self.__logger.error(message)
+            raise InvalidValueError(message)
 
+        self.__url: str = contents.url
         self.__soup: BeautifulSoup = contents.soup
         self.__race_id: int = self.__helper.get_id_from_url(contents.url)
         self.__table: list[Tag] = self.__scrape_shutuba_table()
@@ -173,6 +175,7 @@ class ShutubaTableAPI():
         Returns:
             int | None: 枠番 (枠番が確定していない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_waku: Tag = self.__table[index].find(
             'td', class_=re.compile('Waku'))
         span_waku: Tag = td_waku.contents[0]
@@ -183,8 +186,6 @@ class ShutubaTableAPI():
         except IndexError:
             self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0001)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_umaban(self, index: int) -> int | None:
         """ 馬番をスクレイピングする
@@ -195,6 +196,7 @@ class ShutubaTableAPI():
         Returns:
             int | None: 馬番 (馬番が確定していない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_umaban: Tag = self.__table[index].find(
             'td', class_=re.compile('Umaban'))
         try:
@@ -204,8 +206,6 @@ class ShutubaTableAPI():
         except IndexError:
             self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0002)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_horse_name(self, index: int) -> str:
         """ 馬名をスクレイピングする
@@ -216,6 +216,7 @@ class ShutubaTableAPI():
         Returns:
             str: 馬名
         """
+        self.__validate_table_index(index)
         span_horse_name: Tag = self.__table[index].find(
             'span', class_='HorseName')
         horse_name: str = span_horse_name.a.contents[0]
@@ -230,6 +231,7 @@ class ShutubaTableAPI():
         Returns:
             int: netkeiba 馬ID
         """
+        self.__validate_table_index(index)
         span_horse_name: Tag = self.__table[index].find(
             'span', class_='HorseName')
         horse_url: str = span_horse_name.a.attrs['href']
@@ -244,20 +246,15 @@ class ShutubaTableAPI():
         Returns:
             str: 馬性齢
         """
+        self.__validate_table_index(index)
         try:
             td_barei: Tag = self.__table[index].find('td', class_='Barei')
             sex_age: str = str(td_barei.contents[0])
 
         # 出走取り消し馬の場合
         except AttributeError:
-            try:
-                span_age: Tag = self.__table[index].find('span', class_='Age')
-                sex_age = str(span_age.contents[0])
-            except Exception as e:
-                raise NKScraperException(e)
-
-        except Exception as e:
-            raise NKScraperException(e)
+            span_age: Tag = self.__table[index].find('span', class_='Age')
+            sex_age = str(span_age.contents[0])
 
         return self.__helper.arrange_string(sex_age)
 
@@ -270,6 +267,7 @@ class ShutubaTableAPI():
         Returns:
             float: 斤量
         """
+        self.__validate_table_index(index)
         td_jockey_weight: Tag = self.__table[index].findAll('td')[5]
         return float(td_jockey_weight.contents[0])
 
@@ -282,6 +280,7 @@ class ShutubaTableAPI():
         Returns:
             str | None: 騎手名 (騎手が確定していない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_jockey: Tag = self.__table[index].find('td', class_='Jockey')
         try:
             jockey_name: str = td_jockey.a.contents[0]
@@ -291,8 +290,6 @@ class ShutubaTableAPI():
         except AttributeError:
             self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0003)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_jockey_id(self, index: int) -> int | None:
         """ 騎手IDをスクレイピングする
@@ -303,6 +300,7 @@ class ShutubaTableAPI():
         Returns:
             int | None: netkeiba 騎手ID (騎手が確定していない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_jockey: Tag = self.__table[index].find('td', class_='Jockey')
         try:
             jockey_url: str = td_jockey.a.attrs['href']
@@ -312,8 +310,6 @@ class ShutubaTableAPI():
         except AttributeError:
             self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0004)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_area(self, index: int) -> str:
         """ 所属をスクレイピングする
@@ -324,6 +320,7 @@ class ShutubaTableAPI():
         Returns:
             str: 所属 (栗東・美浦など)
         """
+        self.__validate_table_index(index)
         td_trainer: Tag = self.__table[index].find('td', class_='Trainer')
         span_area: Tag = td_trainer.find('span')
         area: str = span_area.contents[0]
@@ -338,6 +335,7 @@ class ShutubaTableAPI():
         Returns:
             str: 調教師名
         """
+        self.__validate_table_index(index)
         td_trainer: Tag = self.__table[index].find('td', class_='Trainer')
         trainer_name: str = str(td_trainer.a.contents[0])
         return self.__helper.arrange_string(trainer_name)
@@ -351,6 +349,7 @@ class ShutubaTableAPI():
         Returns:
             int: netkeiba 調教師ID
         """
+        self.__validate_table_index(index)
         td_trainer: Tag = self.__table[index].find('td', class_='Trainer')
         trainer_url: str = str(td_trainer.a.attrs['href'])
         return self.__helper.get_id_from_url(trainer_url)
@@ -364,6 +363,7 @@ class ShutubaTableAPI():
         Returns:
             int | None: 馬体重 (馬体重が確定していない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_weight: Tag = self.__table[index].find('td', class_='Weight')
         try:
             horse_weight: str = str(td_weight.contents[0])
@@ -377,8 +377,6 @@ class ShutubaTableAPI():
         except AttributeError:
             self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0006)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_horse_weight_fluctuation(self, index: int) -> int | None:
         """ 馬体重増減をスクレイピングする
@@ -389,6 +387,7 @@ class ShutubaTableAPI():
         Returns:
             int | None: 馬体重増減 (馬体重が確定していない場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_weight: Tag = self.__table[index].find('td', class_='Weight')
         try:
             horse_weight_fluctuation: str = str(td_weight.small.contents[0])
@@ -398,8 +397,6 @@ class ShutubaTableAPI():
         except AttributeError:
             self.__logger.warning(ShutubaTableAPI.__WARN_MESSAGE_0007)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     # Private Functions for Scrape ShutubaTable ------------------------------
     def __scrape_shutuba_table(self) -> list[Tag]:
@@ -409,6 +406,18 @@ class ShutubaTableAPI():
         table_row_list: list[Tag] = table.findAll('tr', class_='HorseList')
         # 出馬表がない場合
         if len(table_row_list) == 0:
-            self.__logger.error(ShutubaTableAPI.__ERR_MESSAGE_0002)
-            sys.exit()
+            message: str = ShutubaTableAPI.__ERR_MESSAGE_02.format(self.__url)
+            self.__logger.error(message)
+            raise TableNotFoundError(message)
         return table_row_list
+
+    # Private Functions for Validate Table Index ----------------------------------
+    def __validate_table_index(self, index: int) -> None:
+        """ 表インデックスをチェックする
+        """
+        min_index: int = 0
+        max_index: int = self.__num_horse - 1
+        if index < min_index or index > max_index:
+            message: str = ShutubaTableAPI.__ERR_MESSAGE_03.format(index, self.__url)
+            self.__logger.error(message)
+            raise TableIndexError(message)

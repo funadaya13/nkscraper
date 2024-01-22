@@ -5,14 +5,13 @@
 from __future__ import annotations
 
 # nkscraper
-from nkscraper.utils import NKScraperException, NKScraperLogger, NKScraperHelper
+from nkscraper.utils import InvalidValueError, TableNotFoundError, TableIndexError, NKScraperLogger, NKScraperHelper
 from nkscraper.common import NetkeibaCategory, NetkeibaContents, NetkeibaRequests
 from nkscraper.url import RaceResultURL
 
 # build-in
 from datetime import datetime
 import re
-import sys
 
 # for type declaration only
 from nkscraper.common import NetkeibaFieldID
@@ -27,8 +26,9 @@ class RaceResultAPI():
     """ レース結果スクレイピングAPIクラス
     """
 
-    __ERR_MESSAGE_0101: str = 'NetkeibaContentsがレース結果ではありません.'
-    __ERR_MESSAGE_0102: str = 'レース結果表が見つかりませんでした.'
+    __ERR_MESSAGE_01: str = 'NetkeibaContentsがレース結果ではありません. category: {}'
+    __ERR_MESSAGE_02: str = 'レース結果表が見つかりませんでした. URL: {}'
+    __ERR_MESSAGE_03: str = 'レース結果表で, 不適切な表インデックスが入力されました. index: {}, URL: {}'
     __WARN_MESSAGE_0101: str = '着順を取得できませんでした. 出走取消馬・または競走除外馬の可能性があります.'
     __WARN_MESSAGE_0102: str = 'タイムを取得できませんでした. 出走取消馬・競走除外馬の可能性があります.'
     __WARN_MESSAGE_0103: str = '単勝人気を取得できませんでした. 出走取消馬の可能性があります.'
@@ -48,9 +48,11 @@ class RaceResultAPI():
         self.__helper: NKScraperHelper = NKScraperHelper()
 
         if contents.category != NetkeibaCategory.RACE_RESULT:
-            self.__logger.error(RaceResultAPI.__ERR_MESSAGE_0101)
-            sys.exit()
+            message: str = RaceResultAPI.__ERR_MESSAGE_01.format(contents.category)
+            self.__logger.error(message)
+            raise InvalidValueError(message)
 
+        self.__url: str = contents.url
         self.__soup: BeautifulSoup = contents.soup
         self.__race_id: int = self.__helper.get_id_from_url(contents.url)
         self.__table: list[Tag] = self.__scrape_race_result_table()
@@ -176,6 +178,7 @@ class RaceResultAPI():
         Returns:
             int | None: 着順 (出走取消馬、競走除外の場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         div_rank: Tag = self.__table[index].find('div', class_='Rank')
         try:
             return int(div_rank.contents[0])
@@ -184,8 +187,6 @@ class RaceResultAPI():
         except ValueError:
             self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0101)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_wakuban(self, index: int) -> int:
         """ 枠番をスクレイピングする
@@ -196,6 +197,7 @@ class RaceResultAPI():
         Returns:
             int: 枠番
         """
+        self.__validate_table_index(index)
         td_waku: Tag = self.__table[index].find('td', class_=re.compile('Waku'))
         div_waku: Tag = td_waku.find('div')
         return int(div_waku.contents[0])
@@ -209,6 +211,7 @@ class RaceResultAPI():
         Returns:
             int: 馬番
         """
+        self.__validate_table_index(index)
         td_umaban: Tag = self.__table[index].findAll('td')[2]
         div_umaban: Tag = td_umaban.find('div')
         return int(div_umaban.contents[0])
@@ -222,6 +225,7 @@ class RaceResultAPI():
         Returns:
             str: 馬名
         """
+        self.__validate_table_index(index)
         span_horse_name: Tag = self.__table[index].find('span', class_='Horse_Name')
         horse_name: str = span_horse_name.a.contents[0]
         return self.__helper.arrange_string(horse_name)
@@ -235,6 +239,7 @@ class RaceResultAPI():
         Returns:
             int: netkeiba 馬ID
         """
+        self.__validate_table_index(index)
         span_horse_name: Tag = self.__table[index].find('span', class_='Horse_Name')
         horse_url: str = span_horse_name.a.attrs['href']
         return self.__helper.get_id_from_url(horse_url)
@@ -248,6 +253,7 @@ class RaceResultAPI():
         Returns:
             str: 馬性齢
         """
+        self.__validate_table_index(index)
         div_horse_info_detail: Tag = self.__table[index].find(
             'div', class_='Horse_Info_Detail')
         span_sex_age: Tag = div_horse_info_detail.find('span')
@@ -263,6 +269,7 @@ class RaceResultAPI():
         Returns:
             float: 斤量
         """
+        self.__validate_table_index(index)
         span_jockey_weight: Tag = self.__table[index].find(
             'span', class_='JockeyWeight')
         return float(span_jockey_weight.contents[0])
@@ -276,6 +283,7 @@ class RaceResultAPI():
         Returns:
             str: 騎手名
         """
+        self.__validate_table_index(index)
         td_jockey: Tag = self.__table[index].find('td', class_='Jockey')
         jockey_name: str = td_jockey.a.contents[0]
         return self.__helper.arrange_string(jockey_name)
@@ -289,6 +297,7 @@ class RaceResultAPI():
         Returns:
             int: netkeiba 騎手ID
         """
+        self.__validate_table_index(index)
         td_jockey: Tag = self.__table[index].find('td', class_='Jockey')
         jockey_url: str = td_jockey.a.attrs['href']
         return self.__helper.get_id_from_url(jockey_url)
@@ -302,6 +311,7 @@ class RaceResultAPI():
         Returns:
             str | None: タイム ex: 3:00.0 (出走取消馬・競走除外馬の場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         span_race_time: Tag = self.__table[index].find(
             'span', class_='RaceTime')
         try:
@@ -312,8 +322,6 @@ class RaceResultAPI():
         except IndexError:
             self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0102)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_tansho_rank(self, index: int) -> int | None:
         """ 単勝人気をスクレイピングする
@@ -324,6 +332,7 @@ class RaceResultAPI():
         Returns:
             int | None: 単勝人気 (出走取消馬の場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         span_odds_people: Tag = self.__table[index].find(
             'span', class_='OddsPeople')
         try:
@@ -333,8 +342,6 @@ class RaceResultAPI():
         except IndexError:
             self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0103)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_tansho_odds(self, index: int) -> float | None:
         """ 単勝オッズをスクレイピングする
@@ -345,6 +352,7 @@ class RaceResultAPI():
         Returns:
             int | None: 単勝オッズ (出走取消馬の場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_tansho_odds: Tag = self.__table[index].findAll('td')[10]
         span_tansho_odds: Tag = td_tansho_odds.find('span')
         try:
@@ -354,8 +362,6 @@ class RaceResultAPI():
         except IndexError:
             self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0104)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_last_3f_time(self, index: int) -> float | None:
         """ 上がり3Fタイムスクレイピングする
@@ -366,6 +372,7 @@ class RaceResultAPI():
         Returns:
             int | None: 上がり3Fタイム (出走取消馬・競走除外馬の場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_last_3f_time: Tag = self.__table[index].findAll('td')[11]
         last_3f_time: str = self.__helper.arrange_string(
             td_last_3f_time.contents[0])
@@ -376,8 +383,6 @@ class RaceResultAPI():
         except ValueError:
             self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0105)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_corner_ranks(self, index: int) -> str | None:
         """ コーナー通過順位をスクレイピングする
@@ -388,6 +393,7 @@ class RaceResultAPI():
         Returns:
             int | None: コーナー通過順位 ex: 14-15-14-15 (出走取消馬・競走除外馬の場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_passage_rate: Tag = self.__table[index].find(
             'td', class_='PassageRate')
         corner_ranks: str = td_passage_rate.contents[0]
@@ -406,6 +412,7 @@ class RaceResultAPI():
         Returns:
             str: 所属
         """
+        self.__validate_table_index(index)
         td_trainer: Tag = self.__table[index].find('td', class_='Trainer')
         span_area: Tag = td_trainer.find('span')
         area: str = span_area.contents[0]
@@ -420,6 +427,7 @@ class RaceResultAPI():
         Returns:
             int | None: 馬体重 (出走取消馬の場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_weight: Tag = self.__table[index].find('td', class_='Weight')
         horse_weight: str = str(td_weight.contents[0])
         try:
@@ -429,8 +437,6 @@ class RaceResultAPI():
         except ValueError:
             self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0107)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     def scrape_horse_weight_fluctuation(self, index: int) -> int | None:
         """ 馬体重増減をスクレイピングする
@@ -441,6 +447,7 @@ class RaceResultAPI():
         Returns:
             int | None: 馬体重増減 (出走取消馬、または、前回計測不能の場合はNoneを返す)
         """
+        self.__validate_table_index(index)
         td_weight: Tag = self.__table[index].find('td', class_='Weight')
         small_weight_fluctuation: Tag = td_weight.find('small')
         try:
@@ -451,8 +458,6 @@ class RaceResultAPI():
         except IndexError:
             self.__logger.warning(RaceResultAPI.__WARN_MESSAGE_0108)
             return None
-        except Exception as e:
-            raise NKScraperException(e)
 
     # Private Functions for Scrape Race Result Table -------------------------
     def __scrape_race_result_table(self) -> list[Tag]:
@@ -461,7 +466,19 @@ class RaceResultAPI():
         table: Tag = self.__soup.find('table', id='All_Result_Table')
         # レース結果表がない場合
         if table is None:
-            self.__logger.error(RaceResultAPI.__ERR_MESSAGE_0102)
-            sys.exit()
+            message: str = RaceResultAPI.__ERR_MESSAGE_02.format(self.__url)
+            self.__logger.error(message)
+            raise TableNotFoundError(message)
         table_row_list: list[Tag] = table.findAll('tr', class_='HorseList')
         return table_row_list
+
+    # Private Functions for Validate Table Index ----------------------------------
+    def __validate_table_index(self, index: int) -> None:
+        """ 表インデックスをチェックする
+        """
+        min_index: int = 0
+        max_index: int = self.__num_horse - 1
+        if index < min_index or index > max_index:
+            message: str = RaceResultAPI.__ERR_MESSAGE_03.format(index, self.__url)
+            self.__logger.error(message)
+            raise TableIndexError(message)
