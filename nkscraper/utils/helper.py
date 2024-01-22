@@ -3,12 +3,11 @@
 """
 
 # nkscraper
-from nkscraper.utils import NKScraperLogger
+from nkscraper.utils import NKScraperLogger, InvalidValueError
 from nkscraper.common import NetkeibaFieldID
 
 # build-in
 import re
-import sys
 
 # for type declaration only
 from logging import Logger
@@ -18,7 +17,7 @@ class NKScraperHelper():
     """ nkscraper ヘルパークラス
     """
 
-    __ERR_MESSAGE_01: str = '競馬場名を NetkeibaFieldID に変換できませんでした.'
+    __ERR_MESSAGE_01: str = '競馬場名を NetkeibaFieldID に変換できませんでした. 競馬場名: {}'
 
     def __init__(self) -> None:
         """ コンストラクタ
@@ -78,5 +77,6 @@ class NKScraperHelper():
         elif field_name == '小倉':
             return NetkeibaFieldID.KOKURA
         else:
-            self.__logger.error(NKScraperHelper.__ERR_MESSAGE_01)
-            sys.exit()
+            message: str = NKScraperHelper.__ERR_MESSAGE_01.format(field_name)
+            self.__logger.error(message)
+            raise InvalidValueError(message)
