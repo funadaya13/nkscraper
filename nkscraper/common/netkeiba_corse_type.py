@@ -9,9 +9,9 @@ from enum import Enum
 class NetkeibaCorseType(Enum):
     """ netkeiba コース種別
     """
-    SHIBA: dict = 1
-    DIRT: dict = 2
-    JUMP: dict = 3
+    SHIBA: int = 1
+    DIRT: int = 2
+    JUMP: int = 3
 
     @property
     def name(self) -> str:
