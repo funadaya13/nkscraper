@@ -152,7 +152,7 @@ class SearchedRaceAPI():
         """ 表インデックスをチェックする
         """
         min_index: int = 0
-        max_index: int = self.__num_horse - 1
+        max_index: int = self.get_num_race() - 1
         if index < min_index or index > max_index:
             message: str = SearchedRaceAPI.__ERR_MESSAGE_02.format(index, self.__url)
             self.__logger.error(message)
