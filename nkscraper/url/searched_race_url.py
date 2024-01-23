@@ -40,7 +40,7 @@ class SearchedRaceURL(NetkeibaURL):
         self.__race_name: str = urllib.parse.quote(race_name, encoding='euc-jp')
         self.__field_id: str = field_id.value
         self.__distance: int = distance
-        self.__corse_type: int = corse_type.value['id']
+        self.__corse_type: int = corse_type.name
         self.__start_year: int = start_year
         self.__start_mon: int = start_month
         self.__end_year: int = end_year
