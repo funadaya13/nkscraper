@@ -223,7 +223,7 @@ class HorseInfoAPI():
         """
         self.__validate_table_index(index)
         field_name: str = self.scrape_field_name(index)
-        return self.__helper.convert_field_name_to_id(field_name)
+        return NetkeibaFieldID.from_field_name(field_name)
 
     def scrape_race_name(self, index: int) -> str:
         """ レース名をスクレイピングする

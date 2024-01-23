@@ -159,7 +159,7 @@ class ShutubaTableAPI():
             NetkeibaFieldID: NetkeibaFieldID
         """
         field_name: str = self.scrape_field_name()
-        return self.__helper.convert_field_name_to_id(field_name)
+        return NetkeibaFieldID.from_field_name(field_name)
 
     def get_num_horse(self) -> int:
         """ レース出走頭数を取得する
