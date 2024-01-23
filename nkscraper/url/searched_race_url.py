@@ -29,7 +29,7 @@ class SearchedRaceURL(NetkeibaURL):
             race_name (str): レース名
             field_id (NetkeibaFieldID): netkeiba 競馬場ID
             distance (int): 距離
-            corse_type (str): '芝' or 'ダ'
+            corse_type (NetkeibaCorseType): netkeiba コース種別
             start_year (int): 検索開始年
             start_month (int): 検索開始月
             end_year (int): 検索終了年
@@ -40,7 +40,7 @@ class SearchedRaceURL(NetkeibaURL):
         self.__race_name: str = urllib.parse.quote(race_name, encoding='euc-jp')
         self.__field_id: str = field_id.value
         self.__distance: int = distance
-        self.__corse_type: int = corse_type.value['display']
+        self.__corse_type: int = corse_type.value['id']
         self.__start_year: int = start_year
         self.__start_mon: int = start_month
         self.__end_year: int = end_year

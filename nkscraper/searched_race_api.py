@@ -6,7 +6,7 @@ from __future__ import annotations
 
 # nkscraper
 from nkscraper.utils import InvalidValueError, TableIndexError, NKScraperLogger, NKScraperHelper
-from nkscraper.common import NetkeibaCategory, NetkeibaContents, NetkeibaRequests, NetkeibaFieldID
+from nkscraper.common import NetkeibaCategory, NetkeibaContents, NetkeibaRequests, NetkeibaFieldID, NetkeibaCorseType
 from nkscraper.url import SearchedRaceURL
 
 # build-in
@@ -48,7 +48,7 @@ class SearchedRaceAPI():
 
     @staticmethod
     def create(race_name: str, field_id: NetkeibaFieldID, 
-               distance: int, corse_type: str, start_year: int,
+               distance: int, corse_type: NetkeibaCorseType, start_year: int,
                start_month: int, end_year: int, end_month: int) -> SearchedRaceAPI:
         """ レース検索結果スクレイピングAPIを作成する
 
@@ -56,7 +56,7 @@ class SearchedRaceAPI():
             race_name (str): レース名
             field_id (NetkeibaFieldID): netkeiba 競馬場ID
             distance (int): 距離
-            corse_type (str): '芝' or 'ダ'
+            corse_type (NetkeibaCorseType): netkeiba コース種別
             start_year (int): 検索開始年
             start_month (int): 検索開始月
             end_year (int): 検索終了年
